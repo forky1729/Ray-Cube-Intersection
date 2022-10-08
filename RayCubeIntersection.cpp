@@ -66,6 +66,16 @@ RayPlane rayPlaneIntersection (ray Ray, Plane Plane)
 
 
 
+vec3 twoPoints(vec3 p1, vec3 p2)
+{
+    vec3 vec;
+    vec.x = p2.x-p1.x;
+    vec.y = p2.y-p1.y;
+    return vec;
+}
+
+
+
 result RayCubeIntersection (ray ray, cube cube)
 {
     result result;
@@ -82,12 +92,12 @@ result RayCubeIntersection (ray ray, cube cube)
 
     //плоскости граней куба
     vec3 AB, AD, BA, BBs, DA, DDs, BsB, BsCs, DsD, DsCs, CsBs, CsDs;
-    Plane ABD = {A, vectorProduct(AB = {B.x-A.x, B.y-A.y, B.z-A.z}, AD = {D.x-A.x, D.y-A.y, D.z-A.z})};
-    Plane ABBs = {B, vectorProduct(BA = {A.x-B.x, A.y-B.y, A.z-B.z}, BBs = {Bs.x-B.x, Bs.y-B.y, Bs.z-B.z})};
-    Plane ADDs = {D, vectorProduct(DA = {A.x-D.x, A.y-D.y, A.z-D.z}, DDs = {Ds.x-D.x, Ds.y-D.y, Ds.z-D.z})};
-    Plane BBsCs = {Bs, vectorProduct(BsB = {B.x-Bs.x, B.y-Bs.y, B.z-Bs.z}, BsCs = {Cs.x-Bs.x, Cs.y-Bs.y, Cs.z-Bs.z})};
-    Plane DDsCs = {Ds, vectorProduct(DsD = {D.x-Ds.x, D.y-Ds.y, D.z-Ds.z}, DsCs = {Cs.x-Ds.x, Cs.y-Ds.y, Cs.z-Ds.z})};
-    Plane BsCsDs = {Cs, vectorProduct(CsBs = {Bs.x-Cs.x, Bs.y-Cs.y, Bs.z-Cs.z}, CsDs = {Ds.x-Cs.x, Ds.y-Cs.y, Ds.z-Cs.z})};
+    Plane ABD = {A, vectorProduct(twoPoints(A,B), twoPoints(A,D))};
+    Plane ABBs = {B, vectorProduct(twoPoints(B,A), twoPoints(B,Bs))};
+    Plane ADDs = {D, vectorProduct(twoPoints(D,A), twoPoints(D,Ds))};
+    Plane BBsCs = {Bs, vectorProduct(twoPoints(Bs,B), twoPoints(Bs,Cs))};
+    Plane DDsCs = {Ds, vectorProduct(twoPoints(Ds,D), twoPoints(Ds,Cs))};
+    Plane BsCsDs = {Cs, vectorProduct(twoPoints(Cs,Bs), twoPoints(Cs,Ds))};
 
 
     //точки пересечения луча и плоскостей граней куба
@@ -148,8 +158,8 @@ int main()
   / |                / |
  /__|__ __ __ __ __ /  |
 | B |               |A |
-|   |     центр     |  |
-|   |       *       |  |
+|   |               |  |
+|   |               |  |
 |   |               |  |
 | Cs|_ __ __ __ __ _|__| Ds
 |  /                |  /
