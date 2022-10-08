@@ -33,6 +33,12 @@ struct Plane       //плоскость
 };
 
 
+struct RayPlane
+{
+    double t;
+    vec3 RayPlane;
+};
+
 
 vec3 vectorProduct (vec3 vec1, vec3 vec2)
 {
@@ -45,7 +51,7 @@ vec3 vectorProduct (vec3 vec1, vec3 vec2)
 
 
 
-vec3 rayPlaneIntersection (ray Ray, Plane Plane)
+RayPlane rayPlaneIntersection (ray Ray, Plane Plane)
 {
     vec3 res0;
     double d;
@@ -55,7 +61,7 @@ vec3 rayPlaneIntersection (ray Ray, Plane Plane)
     res0.x = Ray.origin.x + t*Ray.direction.x;
     res0.y = Ray.origin.y + t*Ray.direction.y;
     res0.z = Ray.origin.z + t*Ray.direction.z;
-    return res0;
+    return {t, res0};
 }
 
 
@@ -85,22 +91,22 @@ result RayCubeIntersection (ray ray, cube cube)
 
 
     //точки пересечения луча и плоскостей граней куба
-    vec3 vABD = rayPlaneIntersection(ray, ABD);
-    vec3 vABBs = rayPlaneIntersection(ray, ABBs);
-    vec3 vADDs = rayPlaneIntersection(ray, ADDs);
-    vec3 vBBsCs = rayPlaneIntersection(ray, BBsCs);
-    vec3 vDDsCs = rayPlaneIntersection(ray, DDsCs);
-    vec3 vBsCsDs = rayPlaneIntersection(ray, BsCsDs);
+    RayPlane vABD = rayPlaneIntersection(ray, ABD);
+    RayPlane vABBs = rayPlaneIntersection(ray, ABBs);
+    RayPlane vADDs = rayPlaneIntersection(ray, ADDs);
+    RayPlane vBBsCs = rayPlaneIntersection(ray, BBsCs);
+    RayPlane vDDsCs = rayPlaneIntersection(ray, DDsCs);
+    RayPlane vBsCsDs = rayPlaneIntersection(ray, BsCsDs);
 
 
     //нахождение точек пересечения с кубом
-    vec3 cross[] = {vABD, vABBs, vADDs, vBBsCs, vDDsCs, vBsCsDs};
-    vec3 temp;
+    RayPlane cross[] = {vABD, vABBs, vADDs, vBBsCs, vDDsCs, vBsCsDs};
+    RayPlane temp;
     for (int i = 0; i < 5; ++i) 
     {
         for (int j = 0; j < 5 - i; ++j)
         {
-            if (cross[j].x > cross[j+1].x) 
+            if (cross[j].t > cross[j+1].t) 
             {
                 temp = cross[j];
                 cross[j] = cross[j+1];
@@ -108,7 +114,7 @@ result RayCubeIntersection (ray ray, cube cube)
             }
         }
     }
-    result = {cross[2], cross[3]};
+    result = {cross[2].RayPlane, cross[3].RayPlane};
     return result;
 }
 
