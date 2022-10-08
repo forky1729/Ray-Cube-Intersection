@@ -137,3 +137,25 @@ int main()
     std::cout<<RayCubeIntersection(ray, cube).res2.x<<" "<<RayCubeIntersection(ray, cube).res2.y<<" "<<RayCubeIntersection(ray, cube).res2.z<<std::endl;
     return 0;
 }
+
+
+
+
+/*
+
+   C__ __ __ __ __ __ _ D
+   /|                 /|
+  / |                / |
+ /__|__ __ __ __ __ /  |
+| B |               |A |
+|   |     центр     |  |
+|   |       *       |  |
+|   |               |  |
+| Cs|_ __ __ __ __ _|__| Ds
+|  /                |  /
+| /                 | /
+|/_ __ __ __ __ __ _|/
+Bs                  As
+
+
+*/
