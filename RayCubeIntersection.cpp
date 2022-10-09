@@ -1,63 +1,105 @@
 #include <iostream>
 
 
-//куб
+// структуры =======================================================================
 
 struct vec3
 {
     float x, y, z;
 };
 
-struct ray          //прямая
+
+struct ray              //прямая
 {
-    vec3 origin;    //начальная точка
-    vec3 direction; //направляющий вектор прямой
+    vec3 origin;        //начальная точка
+    vec3 direction;     //направляющий вектор прямой
 };
 
-struct cube         //кубик
+
+struct cube             //кубик
 {
-    vec3 center;    //центр куба
-    vec3 diagonal;  //направляющий вектор одной из полудиагоналей куба
+    vec3 center;        //центр куба
+    vec3 diagonal;      //направляющий вектор одной из полудиагоналей куба
 };
 
-struct result       //результат
+
+struct result           //результат
 {
     vec3 res1;
     vec3 res2;
 };
 
-struct Plane       //плоскость
+
+struct Plane            //плоскость
 {
-    vec3 point;    //точка плоскости
-    vec3 norm;     //вектор нормали
+    vec3 point;         //точка плоскости
+    vec3 norm;          //вектор нормали
 };
 
 
-struct RayPlane
+struct RayPlane         //точка пересечения прямой и плоскости
 {
-    double t;
+    float t;
     vec3 RayPlane;
 };
 
 
-vec3 vectorProduct (vec3 vec1, vec3 vec2)
+// функции ===========================================================================
+
+vec3 vectorProduct (vec3 vec1, vec3 vec2)                   //векторное произведение
 {
     vec3 res;
-    res.x = vec1.y * vec2.z - vec1.z * vec2.y;
+    res.x =    vec1.y * vec2.z - vec1.z * vec2.y;
     res.y = -(vec1.x * vec2.z - vec1.z * vec2.x);
-    res.z = vec1.x * vec2.y - vec1.y * vec2.x;
+    res.z =    vec1.x * vec2.y - vec1.y * vec2.x;
     return res;
 }
 
+
+vec3 twoPoints(vec3 p1, vec3 p2)                            //координаты вектора из двух точек
+{
+    vec3 vec;
+    vec.x = p2.x-p1.x;
+    vec.y = p2.y-p1.y;
+    vec.z = p2.z-p1.z;
+    return vec;
+}
+
+
+vec3 operator+ (vec3 vec1, vec3 vec2)                       //сложение векторов
+{
+    vec3 vec;
+    vec.x = vec1.x + vec2.x;
+    vec.y = vec1.y + vec2.y;
+    vec.z = vec1.z + vec2.z;
+    return vec;
+}
+
+
+float operator* (vec3 vec1, vec3 vec2)                      //скалярное произведение
+{
+    float res;
+    res = vec1.x*vec2.x + vec1.y*vec2.y + vec1.z*vec2.z;
+    return res;
+}
+
+vec3 operator^ (vec3 vec1, vec3 vec2)
+{
+    vec3 vec;
+    vec.x = vec1.x*vec2.x;
+    vec.y = vec1.y*vec2.y;
+    vec.z = vec1.z*vec2.z;
+    return vec;
+}
 
 
 RayPlane rayPlaneIntersection (ray Ray, Plane Plane)
 {
     vec3 res0;
-    double d;
-    d = -1*(Plane.norm.x*Plane.point.x + Plane.norm.y*Plane.point.y + Plane.norm.z*Plane.point.z);
-    double t;
-    t = -1*(Ray.origin.x*Plane.norm.x + Ray.origin.y*Plane.norm.y + Ray.origin.z*Plane.norm.z + d) / (Ray.direction.x*Plane.norm.x + Ray.direction.y*Plane.norm.y +Ray.direction.z*Plane.norm.z);
+    float d;
+    d = -1*(Plane.norm*Plane.point);
+    float t;
+    t = -1*(Ray.origin*Plane.norm + d) / (Ray.direction*Plane.norm);
     res0.x = Ray.origin.x + t*Ray.direction.x;
     res0.y = Ray.origin.y + t*Ray.direction.y;
     res0.z = Ray.origin.z + t*Ray.direction.z;
@@ -65,21 +107,9 @@ RayPlane rayPlaneIntersection (ray Ray, Plane Plane)
 }
 
 
-
-vec3 twoPoints(vec3 p1, vec3 p2)
-{
-    vec3 vec;
-    vec.x = p2.x-p1.x;
-    vec.y = p2.y-p1.y;
-    return vec;
-}
-
-
-
 result RayCubeIntersection (ray ray, cube cube)
 {
     result result;
-
 
     //координаты вершин куба
     vec3 A = {cube.center.x + cube.diagonal.x, cube.center.y + cube.diagonal.y, cube.center.z + cube.diagonal.z};
@@ -89,15 +119,21 @@ result RayCubeIntersection (ray ray, cube cube)
     vec3 D = {cube.center.x - cube.diagonal.x, cube.center.y + cube.diagonal.y, cube.center.z + cube.diagonal.z};
     vec3 Bs = {cube.center.x + cube.diagonal.x, cube.center.y - cube.diagonal.y, cube.center.z - cube.diagonal.z};
 
+    //вектора нормали
+    vec3 n1, n2, n3;
+    n1 = vectorProduct(twoPoints(A,B), twoPoints(A,D));
+    n2 = vectorProduct(twoPoints(B,A), twoPoints(B,Bs));
+    n3 = vectorProduct(twoPoints(D,A), twoPoints(D,Ds));
+    vec3 minus = {-1, -1, -1};
+    
 
     //плоскости граней куба
-    vec3 AB, AD, BA, BBs, DA, DDs, BsB, BsCs, DsD, DsCs, CsBs, CsDs;
-    Plane ABD = {A, vectorProduct(twoPoints(A,B), twoPoints(A,D))};
-    Plane ABBs = {B, vectorProduct(twoPoints(B,A), twoPoints(B,Bs))};
-    Plane ADDs = {D, vectorProduct(twoPoints(D,A), twoPoints(D,Ds))};
-    Plane BBsCs = {Bs, vectorProduct(twoPoints(Bs,B), twoPoints(Bs,Cs))};
-    Plane DDsCs = {Ds, vectorProduct(twoPoints(Ds,D), twoPoints(Ds,Cs))};
-    Plane BsCsDs = {Cs, vectorProduct(twoPoints(Cs,Bs), twoPoints(Cs,Ds))};
+    Plane ABD = {A, n1};
+    Plane ABBs = {B, n2};
+    Plane ADDs = {D, n3};
+    Plane BBsCs = {Bs, minus^n3};
+    Plane DDsCs = {Ds, minus^n2};
+    Plane BsCsDs = {Cs, minus^n1};
 
 
     //точки пересечения луча и плоскостей граней куба
@@ -110,22 +146,33 @@ result RayCubeIntersection (ray ray, cube cube)
 
 
     //нахождение точек пересечения с кубом
-    RayPlane cross[] = {vABD, vABBs, vADDs, vBBsCs, vDDsCs, vBsCsDs};
-    RayPlane temp;
-    for (int i = 0; i < 5; ++i) 
+    RayPlane cross_max[3];
+    RayPlane cross_min[3];
+
+    float t1, t2;
+
+
+    vABD.t > vBsCsDs.t ?  cross_max[0] = vABD, cross_min[0] = vBsCsDs : cross_max[0] = vBsCsDs, cross_min[0] = vABD;
+    vABBs.t > vDDsCs.t ?  cross_max[1] = vABBs, cross_min[1] = vDDsCs : cross_max[1] = vDDsCs, cross_min[1] = vABBs;
+    vBBsCs.t > vADDs.t ?  cross_max[2] = vBBsCs, cross_min[2] = vADDs : cross_max[2] = vADDs, cross_min[2] = vBBsCs;
+
+    cross_max[0].t < cross_max[1].t
+        ? (cross_max[0].t < cross_max[2].t ? (result.res1 = cross_max[0].RayPlane , t1 = cross_max[0].t) : (result.res1 = cross_max[2].RayPlane , t1 = cross_max[2].t))
+        : (cross_max[1].t < cross_max[2].t ? (result.res1 = cross_max[1].RayPlane , t1 = cross_max[1].t) : (result.res1 = cross_max[2].RayPlane , t1 = cross_max[2].t));
+    
+    cross_min[0].t > cross_min[1].t
+        ? (cross_min[0].t > cross_min[2].t ? (result.res2 = cross_min[0].RayPlane , t2 = cross_min[0].t) : (result.res2 = cross_min[2].RayPlane , t2 = cross_min[2].t))
+        : (cross_min[1].t > cross_min[2].t ? (result.res2 = cross_min[1].RayPlane , t2 = cross_min[1].t) : (result.res2 = cross_min[2].RayPlane , t2 = cross_min[2].t));
+    
+
+    if (t2<t1)
     {
-        for (int j = 0; j < 5 - i; ++j)
-        {
-            if (cross[j].t > cross[j+1].t) 
-            {
-                temp = cross[j];
-                cross[j] = cross[j+1];
-                cross[j+1] = temp;
-            }
-        }
+        return result = {{111,0,0}, {0,0,0}};
     }
-    result = {cross[2].RayPlane, cross[3].RayPlane};
-    return result;
+    else
+    {
+        return result;
+    }
 }
 
 
