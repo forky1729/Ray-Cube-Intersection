@@ -83,15 +83,6 @@ float operator* (vec3 vec1, vec3 vec2)                      //скалярное
     return res;
 }
 
-vec3 operator^ (vec3 vec1, vec3 vec2)
-{
-    vec3 vec;
-    vec.x = vec1.x*vec2.x;
-    vec.y = vec1.y*vec2.y;
-    vec.z = vec1.z*vec2.z;
-    return vec;
-}
-
 
 RayPlane rayPlaneIntersection (ray Ray, Plane Plane)
 {
@@ -124,16 +115,15 @@ result RayCubeIntersection (ray ray, cube cube)
     n1 = vectorProduct(twoPoints(A,B), twoPoints(A,D));
     n2 = vectorProduct(twoPoints(B,A), twoPoints(B,Bs));
     n3 = vectorProduct(twoPoints(D,A), twoPoints(D,Ds));
-    vec3 minus = {-1, -1, -1};
     
 
     //плоскости граней куба
     Plane ABD = {A, n1};
     Plane ABBs = {B, n2};
     Plane ADDs = {D, n3};
-    Plane BBsCs = {Bs, minus^n3};
-    Plane DDsCs = {Ds, minus^n2};
-    Plane BsCsDs = {Cs, minus^n1};
+    Plane BBsCs = {Bs, n3};
+    Plane DDsCs = {Ds, n2};
+    Plane BsCsDs = {Cs, n1};
 
 
     //точки пересечения луча и плоскостей граней куба
