@@ -24,6 +24,7 @@ struct result           //результат
 {
     vec3 res1;
     vec3 res2;
+    bool m;
 };
 
 struct Plane            //плоскость
@@ -219,14 +220,15 @@ result RayCubeIntersection (ray ray, cube cube)
         }
     }
     
+
     //проверка на наличие пересечения
     if (t2>t1)
     {
-        return result = {{111,0,0}, {0,0,117}};
+        return result = {{111,0,0}, {0,0,117}, false};
     }
     else
     {
-        return result;
+        return result = {result.res1, result.res2, true};
     }
 }
 
@@ -245,6 +247,7 @@ int main()
     std::cin>>v4.x>>v4.y>>v4.z;
     ray ray = {v1,v2};
     cube cube = {v3,v4};
+    std::cout<<RayCubeIntersection(ray, cube).m<<std::endl;
     std::cout<<RayCubeIntersection(ray, cube).res1.x<<" "<<RayCubeIntersection(ray, cube).res1.y<<" "<<RayCubeIntersection(ray, cube).res1.z<<std::endl;
     std::cout<<RayCubeIntersection(ray, cube).res2.x<<" "<<RayCubeIntersection(ray, cube).res2.y<<" "<<RayCubeIntersection(ray, cube).res2.z<<std::endl;
     return 0;
