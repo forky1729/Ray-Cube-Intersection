@@ -8,13 +8,11 @@ struct vec3
     float x, y, z;
 };
 
-
 struct ray              //прямая
 {
     vec3 origin;        //начальная точка
     vec3 direction;     //направляющий вектор прямой
 };
-
 
 struct cube             //кубик
 {
@@ -22,20 +20,17 @@ struct cube             //кубик
     vec3 diagonal;      //направляющий вектор одной из полудиагоналей куба
 };
 
-
 struct result           //результат
 {
     vec3 res1;
     vec3 res2;
 };
 
-
 struct Plane            //плоскость
 {
     vec3 point;         //точка плоскости
     vec3 norm;          //вектор нормали
 };
-
 
 struct RayPlane         //точка пересечения прямой и плоскости
 {
@@ -55,16 +50,14 @@ vec3 vectorProduct (vec3 vec1, vec3 vec2)                   //векторное
     return res;
 }
 
-
 vec3 operator- (vec3 p1, vec3 p2)                            //координаты вектора из двух точек
 {
     vec3 vec;
-    vec.x = p2.x-p1.x;
-    vec.y = p2.y-p1.y;
-    vec.z = p2.z-p1.z;
+    vec.x = p1.x-p2.x;
+    vec.y = p1.y-p2.y;
+    vec.z = p1.z-p2.z;
     return vec;
 }
-
 
 vec3 operator+ (vec3 vec1, vec3 vec2)                       //сложение векторов
 {
@@ -75,7 +68,6 @@ vec3 operator+ (vec3 vec1, vec3 vec2)                       //сложение �
     return vec;
 }
 
-
 float operator* (vec3 vec1, vec3 vec2)                      //скалярное произведение
 {
     float res;
@@ -83,8 +75,7 @@ float operator* (vec3 vec1, vec3 vec2)                      //скалярное
     return res;
 }
 
-
-RayPlane rayPlaneIntersection (ray Ray, Plane Plane)
+RayPlane rayPlaneIntersection (ray Ray, Plane Plane)        //пересечение прямой с плоскостью
 {
     vec3 res0;
     float d;
@@ -112,11 +103,10 @@ result RayCubeIntersection (ray ray, cube cube)
 
     //вектора нормали
     vec3 n1, n2, n3;
-    n1 = vectorProduct(A-B, A-D);
-    n2 = vectorProduct(B-A, B-Bs);
-    n3 = vectorProduct(D-A, D-D);
+    n1 = vectorProduct(B-A, D-A);
+    n2 = vectorProduct(A-B, Bs-B);
+    n3 = vectorProduct(A-D, Ds-D);
     
-
     //плоскости граней куба
     Plane ABD = {A, n1};
     Plane ABBs = {B, n2};
@@ -124,7 +114,6 @@ result RayCubeIntersection (ray ray, cube cube)
     Plane BBsCs = {Bs, n3};
     Plane DDsCs = {Ds, n2};
     Plane BsCsDs = {Cs, n1};
-
 
     //точки пересечения луча и плоскостей граней куба
     RayPlane vABD = rayPlaneIntersection(ray, ABD);
@@ -134,15 +123,13 @@ result RayCubeIntersection (ray ray, cube cube)
     RayPlane vDDsCs = rayPlaneIntersection(ray, DDsCs);
     RayPlane vBsCsDs = rayPlaneIntersection(ray, BsCsDs);
 
-
     //нахождение точек пересечения с кубом
     RayPlane cross_max[3];
     RayPlane cross_min[3];
 
-
     float t1, t2;
 
-
+    //выбор максимума и минимума из двух параллельных плоскостей
     if (vABD.t > vBsCsDs.t)
     {
         cross_max[0] = vABD;
@@ -161,7 +148,8 @@ result RayCubeIntersection (ray ray, cube cube)
     }
     else
     {
-        cross_max[1] = vDDsCs, cross_min[1] = vABBs;
+        cross_max[1] = vDDsCs;
+        cross_min[1] = vABBs;
     }
 
     if (vBBsCs.t > vADDs.t)
@@ -175,7 +163,7 @@ result RayCubeIntersection (ray ray, cube cube)
         cross_min[2] = vBBsCs;
     }
     
-
+    //нахождение максимального t из минимальных и минимального из максимальных
     if (cross_max[0].t < cross_max[1].t)
     {
         if (cross_max[0].t < cross_max[2].t)
@@ -231,10 +219,10 @@ result RayCubeIntersection (ray ray, cube cube)
         }
     }
     
-
-    if (t2<t1)
+    //проверка на наличие пересечения
+    if (t2>t1)
     {
-        return result = {{111,0,0}, {0,0,0}};
+        return result = {{111,0,0}, {0,0,117}};
     }
     else
     {
